@@ -1,53 +1,64 @@
+import os
+import sys
 from io import BytesIO
-
 import pygame
-from functions import get_static
+from funcs import get_static
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
 
 
 class BigMap:
     def __init__(self):
         self.image = None
-        self.lon, self.lat = 60.153191, 55.156353
+        self.ll = 60.153191, 55.156353
         self.layer = 'map'
-        self.z = 0
+        self.z = 17
         self.update_map()
 
     def update_map(self):
         map_params = {
+            "ll": ",".join(map(str, self.ll)),
+            'z': self.z,
             "l": "map",
-            "z": self.z,
-            "ll": ",".join(map(str, (self.lon, self.lat))),
-            "size": "650,450"
+            'size': '650,450'
         }
         image = BytesIO(get_static(**map_params))
         self.image = pygame.image.load(image)
 
+    def event_handler(self, event):
+        pass
+
     def draw(self, surf):
         surf.blit(self.image, (0, 0))
 
-    def event_handler(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_PAGEUP:
-                self.z = min(self.z + 1, 21)
-            if event.key == pygame.K_PAGEDOWN:
-                self.z = max(self.z - 1, 0)
-            if event.key == pygame.K_LEFT:
-                self.lon = (self.lon - 180 - 300) % 180 + 180
-            if event.key == pygame.K_RIGHT:
-                self.lon = (self.lon - 180 + 300) % 180 + 180
-            self.update_map()
 
+if __name__ == '__main__':
+    pygame.init()
+    SIZE = W, H = 650, 450
+    screen = pygame.display.set_mode(SIZE)
+    app = BigMap()
 
-pygame.init()
-SIZE = W, H = 650, 450
-screen = pygame.display.set_mode(SIZE)
-app = BigMap()
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        app.event_handler(event)
-    screen.fill(pygame.Color('black'))
-    app.draw(screen)
-    pygame.display.flip()
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            app.event_handler(event)
+
+        screen.fill('black')
+        app.draw(screen)
+        pygame.display.flip()
