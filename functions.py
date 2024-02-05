@@ -7,9 +7,14 @@ def get_static(**params):
     return response.content
 
 
-def geocoder(**params):
+def geocode(toponym_name):
     geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
-    response = requests.get(geocoder_api_server, params=params)
+    geocoder_params = {
+        "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+        "geocode": toponym_name,
+        "format": "json"
+    }
+    response = requests.get(geocoder_api_server, params=geocoder_params)
 
     if not response:
         print('Oh no Error', response.status_code, response.reason)

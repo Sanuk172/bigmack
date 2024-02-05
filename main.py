@@ -2,7 +2,7 @@ from io import BytesIO
 import pygame_gui
 
 import pygame
-from functions import get_static
+from functions import *
 
 
 class BigMap:
@@ -10,7 +10,7 @@ class BigMap:
 
     def __init__(self):
         self.image = None
-        self.lon, self.lat = 60.153191, 55.156353
+        self.lon, self.lat = get_toponym_coord(get_toponym(geocode('Переулок лучевой 3 миасс')))
         self.layer = 'map'
         self.z = 17
         self.update_map()
