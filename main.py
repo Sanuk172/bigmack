@@ -6,7 +6,7 @@ from functions import get_static
 
 
 class BigMap:
-    options = ['map', 'sat', 'sat,skl']
+    options = ['map', 'sat', 'map,skl']
 
     def __init__(self):
         self.image = None
