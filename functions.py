@@ -26,6 +26,16 @@ def get_toponym(json_data):
     return json_data["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
 
 
+def get_toponym_address(toponym):
+    address = toponym['metaDataProperty']['GeocoderMetaData']['Address']['formatted']
+    try:
+        postal = toponym['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
+    except KeyError:
+        postal = None
+    return address, postal
+
+
+
 def get_toponym_coord(toponym):
     return list(map(float, toponym["Point"]["pos"].split(' ')))
 
