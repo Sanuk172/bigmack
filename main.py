@@ -26,6 +26,7 @@ class BigMap:
         self.search_field = pygame_gui.elements.UITextEntryLine(pygame.Rect(175, 420, 300, 30), self.manager)
         self.error_field = pygame_gui.elements.UILabel(pygame.Rect(100, 380, 450, 30), '', self.manager)
         self.error_field.text_colour = 255, 255, 255
+        self.clear_button = pygame_gui.elements.UIButton(pygame.Rect(420, 410, 100, 30), 'Сброс', self.manager)
         self.update_map()
 
     def update_map(self):
@@ -67,11 +68,20 @@ class BigMap:
                 self.update_map()
         self.manager.process_events(event)
 
+    def clear_search(self):
+        self.point = None
+        self.search_field.set_text('')
+        self.search_field.focus()
+        self.update_map()
+
     def gui_event_handler(self, event):
         if event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
             if event.ui_element == self.layers_select:
                 self.layer = event.text
                 self.update_map()
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == self.clear_button:
+                self.clear_search()
 
     def draw(self, surf):
         surf.blit(self.image, (0, 0))
