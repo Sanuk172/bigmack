@@ -5,19 +5,27 @@ import pygame
 from functions import *
 
 
+KEYS = (pygame.K_PAGEUP, pygame.K_PAGEDOWN, pygame.K_LEFT,
+        pygame.K_RIGHT, pygame.K_UP,
+        pygame.K_DOWN, pygame.K_RETURN)
+
+
 class BigMap:
     options = ['map', 'sat', 'map,skl']
 
     def __init__(self):
         self.image = None
-        self.lon, self.lat = get_toponym_coord(get_toponym(geocode('Переулок лучевой 3 миасс')))
+        self.lon, self.lat = get_toponym_coord(get_toponym(geocode('Автозаводцев проспект 16 миасс')))
         self.layer = 'map'
+        self.point = None
         self.z = 17
         self.manager = pygame_gui.UIManager(SIZE)
         self.layers_select = (pygame_gui.elements.UIDropDownMenu(self.options, self.options[0],
                                                                  pygame.Rect(440, 10, 200, 30),
                                                                  self.manager))
         self.search_field = pygame_gui.elements.UITextEntryLine(pygame.Rect(175, 420, 300, 30), self.manager)
+        self.error_field = pygame_gui.elements.UILabel(pygame.Rect(100, 380, 450, 30), '', self.manager)
+        self.error_field.text_colour = 255, 255, 255
         self.update_map()
 
     def update_map(self):
@@ -27,6 +35,8 @@ class BigMap:
             "l": self.layer,
             'size': '650,450'
         }
+        if self.point is not None:
+            map_params["pt"] = ",".join(map(str, self.point)) + ",flag"
         image = BytesIO(get_static(**map_params))
         self.image = pygame.image.load(image)
 
@@ -44,7 +54,17 @@ class BigMap:
                 self.lat = min(self.lat + 70 * 2 ** (-self.z), 89)
             if event.key == pygame.K_DOWN:
                 self.lat = max(self.lat - 70 * 2 ** (-self.z), -89)
-            self.update_map()
+            if event.key == pygame.K_RETURN:
+                text = self.search_field.get_text()
+                if text:
+                    try:
+                        self.lon, self.lat = get_toponym_coord(get_toponym(geocode(text)))
+                        self.error_field.set_text('')
+                        self.point = self.lon, self.lat
+                    except IndexError as e:
+                        self.error_field.set_text('Ничего не найдено')
+            if event.key in KEYS:
+                self.update_map()
         self.manager.process_events(event)
 
     def gui_event_handler(self, event):
