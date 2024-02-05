@@ -13,12 +13,12 @@ class BigMap:
         self.lon, self.lat = get_toponym_coord(get_toponym(geocode('Переулок лучевой 3 миасс')))
         self.layer = 'map'
         self.z = 17
-        self.update_map()
-
         self.manager = pygame_gui.UIManager(SIZE)
         self.layers_select = (pygame_gui.elements.UIDropDownMenu(self.options, self.options[0],
                                                                  pygame.Rect(440, 10, 200, 30),
                                                                  self.manager))
+        self.search_field = pygame_gui.elements.UITextEntryLine(pygame.Rect(175, 420, 300, 30), self.manager)
+        self.update_map()
 
     def update_map(self):
         map_params = {
@@ -30,7 +30,7 @@ class BigMap:
         image = BytesIO(get_static(**map_params))
         self.image = pygame.image.load(image)
 
-    def event_hendler(self, event):
+    def event_handler(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEUP:
                 self.z = min(self.z + 1, 21)
@@ -79,7 +79,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        app.event_hendler(event)
+        app.event_handler(event)
         app.gui_event_handler(event)
     app.update_gui(time_delta)
     screen.fill('black')
